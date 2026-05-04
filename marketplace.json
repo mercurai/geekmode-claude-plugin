@@ -2,7 +2,7 @@
   "name": "geekmode-claude-plugin",
   "description": "Claude Code plugin for managing the geekmode-rust ticket monitoring application. Bundles agents, skills, hooks, and MCP server into a single install.",
   "repo": "https://github.com/mercurai/geekmode-claude-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Mercurai",
   "tags": ["ticketmaster", "monitoring", "geekmode"],
   "install": "claude plugins install mercurai/geekmode-claude-plugin"

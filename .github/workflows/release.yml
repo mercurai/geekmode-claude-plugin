@@ -1,0 +1,109 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Create plugin release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate plugin manifests
+        run: |
+          jq . plugin.json > /dev/null && echo "plugin.json: OK"
+          jq . marketplace.json > /dev/null && echo "marketplace.json: OK"
+
+      - name: Download gm-mcp binaries from geekmode-rust latest release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Find the latest geekmode-rust release that is >= v0.6.15
+          LATEST=$(gh release list --repo mercurai/geekmode-rust --limit 1 --json tagName -q '.[0].tagName')
+          echo "Fetching gm-mcp from geekmode-rust $LATEST"
+
+          mkdir -p mcp
+
+          # Windows binary
+          gh release download "$LATEST" \
+            --repo mercurai/geekmode-rust \
+            --pattern "gm-mcp-x86_64-pc-windows-msvc.exe" \
+            --dir mcp/ \
+            --clobber || echo "Windows binary not found in release (manual step required)"
+
+          # Linux binary
+          gh release download "$LATEST" \
+            --repo mercurai/geekmode-rust \
+            --pattern "gm-mcp-x86_64-unknown-linux-musl" \
+            --dir mcp/ \
+            --clobber || echo "Linux binary not found in release (manual step required)"
+
+          # macOS binary
+          gh release download "$LATEST" \
+            --repo mercurai/geekmode-rust \
+            --pattern "gm-mcp-aarch64-apple-darwin" \
+            --dir mcp/ \
+            --clobber || echo "macOS binary not found in release (manual step required)"
+
+          ls -lh mcp/ || true
+
+      - name: Rename binaries to canonical names
+        run: |
+          [ -f "mcp/gm-mcp-x86_64-pc-windows-msvc.exe" ] && \
+            mv mcp/gm-mcp-x86_64-pc-windows-msvc.exe mcp/gm-mcp.exe || true
+          [ -f "mcp/gm-mcp-x86_64-unknown-linux-musl" ] && \
+            mv mcp/gm-mcp-x86_64-unknown-linux-musl mcp/gm-mcp-linux-x64 && \
+            chmod +x mcp/gm-mcp-linux-x64 || true
+          [ -f "mcp/gm-mcp-aarch64-apple-darwin" ] && \
+            mv mcp/gm-mcp-aarch64-apple-darwin mcp/gm-mcp-darwin-arm64 && \
+            chmod +x mcp/gm-mcp-darwin-arm64 || true
+
+      - name: Create plugin archive
+        run: |
+          tar -czf geekmode-claude-plugin-${{ steps.version.outputs.VERSION }}.tar.gz \
+            agents/ skills/ hooks/ mcp/ commands/ \
+            plugin.json marketplace.json package.json README.md LICENSE
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            geekmode-claude-plugin-${{ steps.version.outputs.VERSION }}.tar.gz
+          generate_release_notes: true
+          body: |
+            ## geekmode-claude-plugin ${{ github.ref_name }}
+
+            Claude Code plugin for managing the [geekmode-rust](https://github.com/mercurai/geekmode-rust) ticket monitoring application.
+
+            ### Compatibility
+
+            | Plugin | geekmode-rust |
+            |--------|--------------|
+            | ${{ github.ref_name }} | ≥ v0.6.15 |
+
+            ### Install
+
+            ```sh
+            claude plugins install mercurai/geekmode-claude-plugin
+            ```
+
+            ### What's included
+
+            - 6 agents (reserve-ops, monitor-ops, probe-ops, tmpt-ops, proxy-ops, logs-analyst)
+            - 7 skills (/tasks, /reserves, /probe, /logs, /watch, /health, /metrics)
+            - 4 hooks (SessionStart, PreToolUse, PostToolUse, Stop)
+            - MCP server (`gm-mcp`) bundled from geekmode-rust release artifacts
+
+            ### Manual gm-mcp install
+
+            If the binary download step failed, see [mcp/README.md](mcp/README.md) for manual installation instructions.
