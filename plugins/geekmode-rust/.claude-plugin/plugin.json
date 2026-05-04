@@ -10,8 +10,5 @@
   "homepage": "https://github.com/mercurai/geekmode-claude-plugin",
   "repository": "https://github.com/mercurai/geekmode-claude-plugin",
   "license": "MIT",
-  "keywords": ["geekmode", "ticketmaster", "agents", "mcp"],
-  "mcpServers": [
-    {"name": "geekmode-rust", "command": "${PLUGIN_ROOT}/mcp/gm-mcp.exe", "args": []}
-  ]
+  "keywords": ["geekmode", "ticketmaster", "agents", "mcp"]
 }
