@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "geekmode-claude-plugin",
+  "owner": {
+    "name": "Mercurai",
+    "url": "https://github.com/mercurai/geekmode-claude-plugin"
+  },
+  "plugins": [
+    {
+      "name": "geekmode-rust",
+      "source": "./plugins/geekmode-rust",
+      "description": "Claude Code plugin for managing the geekmode-rust ticket monitoring application — agents, skills, hooks, and MCP server."
+    }
+  ]
+}

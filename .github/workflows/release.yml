@@ -21,8 +21,8 @@ jobs:
 
       - name: Validate plugin manifests
         run: |
-          jq . plugin.json > /dev/null && echo "plugin.json: OK"
-          jq . marketplace.json > /dev/null && echo "marketplace.json: OK"
+          jq . .claude-plugin/marketplace.json > /dev/null && echo "marketplace.json: OK"
+          jq . plugins/geekmode-rust/.claude-plugin/plugin.json > /dev/null && echo "plugin.json: OK"
 
       - name: Download gm-mcp binaries from geekmode-rust latest release
         env:
@@ -32,47 +32,47 @@ jobs:
           LATEST=$(gh release list --repo mercurai/geekmode-rust --limit 1 --json tagName -q '.[0].tagName')
           echo "Fetching gm-mcp from geekmode-rust $LATEST"
 
-          mkdir -p mcp
+          mkdir -p plugins/geekmode-rust/mcp
 
           # Windows binary
           gh release download "$LATEST" \
             --repo mercurai/geekmode-rust \
             --pattern "gm-mcp-x86_64-pc-windows-msvc.exe" \
-            --dir mcp/ \
+            --dir plugins/geekmode-rust/mcp/ \
             --clobber || echo "Windows binary not found in release (manual step required)"
 
           # Linux binary
           gh release download "$LATEST" \
             --repo mercurai/geekmode-rust \
             --pattern "gm-mcp-x86_64-unknown-linux-musl" \
-            --dir mcp/ \
+            --dir plugins/geekmode-rust/mcp/ \
             --clobber || echo "Linux binary not found in release (manual step required)"
 
           # macOS binary
           gh release download "$LATEST" \
             --repo mercurai/geekmode-rust \
             --pattern "gm-mcp-aarch64-apple-darwin" \
-            --dir mcp/ \
+            --dir plugins/geekmode-rust/mcp/ \
             --clobber || echo "macOS binary not found in release (manual step required)"
 
-          ls -lh mcp/ || true
+          ls -lh plugins/geekmode-rust/mcp/ || true
 
       - name: Rename binaries to canonical names
         run: |
-          [ -f "mcp/gm-mcp-x86_64-pc-windows-msvc.exe" ] && \
-            mv mcp/gm-mcp-x86_64-pc-windows-msvc.exe mcp/gm-mcp.exe || true
-          [ -f "mcp/gm-mcp-x86_64-unknown-linux-musl" ] && \
-            mv mcp/gm-mcp-x86_64-unknown-linux-musl mcp/gm-mcp-linux-x64 && \
-            chmod +x mcp/gm-mcp-linux-x64 || true
-          [ -f "mcp/gm-mcp-aarch64-apple-darwin" ] && \
-            mv mcp/gm-mcp-aarch64-apple-darwin mcp/gm-mcp-darwin-arm64 && \
-            chmod +x mcp/gm-mcp-darwin-arm64 || true
+          [ -f "plugins/geekmode-rust/mcp/gm-mcp-x86_64-pc-windows-msvc.exe" ] && \
+            mv plugins/geekmode-rust/mcp/gm-mcp-x86_64-pc-windows-msvc.exe plugins/geekmode-rust/mcp/gm-mcp.exe || true
+          [ -f "plugins/geekmode-rust/mcp/gm-mcp-x86_64-unknown-linux-musl" ] && \
+            mv plugins/geekmode-rust/mcp/gm-mcp-x86_64-unknown-linux-musl plugins/geekmode-rust/mcp/gm-mcp-linux-x64 && \
+            chmod +x plugins/geekmode-rust/mcp/gm-mcp-linux-x64 || true
+          [ -f "plugins/geekmode-rust/mcp/gm-mcp-aarch64-apple-darwin" ] && \
+            mv plugins/geekmode-rust/mcp/gm-mcp-aarch64-apple-darwin plugins/geekmode-rust/mcp/gm-mcp-darwin-arm64 && \
+            chmod +x plugins/geekmode-rust/mcp/gm-mcp-darwin-arm64 || true
 
       - name: Create plugin archive
         run: |
           tar -czf geekmode-claude-plugin-${{ steps.version.outputs.VERSION }}.tar.gz \
-            agents/ skills/ hooks/ mcp/ commands/ \
-            plugin.json marketplace.json package.json README.md LICENSE
+            .claude-plugin/ plugins/ \
+            README.md LICENSE
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
@@ -93,8 +93,9 @@ jobs:
 
             ### Install
 
-            ```sh
-            claude plugins install mercurai/geekmode-claude-plugin
+            ```
+            /plugin marketplace add mercurai/geekmode-claude-plugin
+            /plugin install geekmode-rust@geekmode-claude-plugin
             ```
 
             ### What's included
