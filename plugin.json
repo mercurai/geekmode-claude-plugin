@@ -1,0 +1,12 @@
+{
+  "name": "geekmode-claude-plugin",
+  "version": "0.1.0",
+  "description": "Claude Code plugin for managing the geekmode-rust ticket monitoring application",
+  "author": "Mercurai",
+  "homepage": "https://github.com/mercurai/geekmode-claude-plugin",
+  "agents": [],
+  "skills": [],
+  "commands": [],
+  "hooks": [],
+  "mcpServers": []
+}

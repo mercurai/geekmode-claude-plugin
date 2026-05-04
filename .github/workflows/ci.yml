@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  validate:
+    name: Validate plugin manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint JSON files (jq)
+        run: |
+          echo "Checking plugin.json..."
+          jq . plugin.json > /dev/null && echo "plugin.json: OK"
+          echo "Checking marketplace.json..."
+          jq . marketplace.json > /dev/null && echo "marketplace.json: OK"
+          echo "Checking package.json..."
+          jq . package.json > /dev/null && echo "package.json: OK"
+
+      - name: Validate plugin.json required fields
+        run: |
+          jq -e '
+            .name and .version and .description and .author and .homepage and
+            (.agents | type == "array") and
+            (.skills | type == "array") and
+            (.commands | type == "array") and
+            (.hooks | type == "array") and
+            (.mcpServers | type == "array")
+          ' plugin.json > /dev/null && echo "plugin.json schema: OK"
+
+      # Note: `claude plugins validate` requires the Claude Code CLI, which is not
+      # available in GitHub Actions runners. The jq checks above provide equivalent
+      # syntactic and structural validation for CI. Run `claude plugins validate`
+      # locally before publishing a release.
