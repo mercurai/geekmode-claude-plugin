@@ -1,0 +1,9 @@
+{
+  "name": "geekmode-claude-plugin",
+  "version": "0.2.0",
+  "description": "Claude Code plugin for managing the geekmode-rust ticket monitoring application",
+  "private": true,
+  "scripts": {
+    "lint:json": "node -e \"['../../.claude-plugin/marketplace.json','.claude-plugin/plugin.json','hooks/hooks.json'].forEach(f => { JSON.parse(require('fs').readFileSync(f,'utf8')); console.log(f + ' OK'); })\""
+  }
+}
