@@ -34,39 +34,14 @@ jobs:
 
           mkdir -p plugins/geekmode-rust/mcp
 
-          # Windows binary
+          # Windows binary (geekmode-rust release attaches gm-mcp.exe directly)
           gh release download "$LATEST" \
             --repo mercurai/geekmode-rust \
-            --pattern "gm-mcp-x86_64-pc-windows-msvc.exe" \
+            --pattern "gm-mcp.exe" \
             --dir plugins/geekmode-rust/mcp/ \
             --clobber || echo "Windows binary not found in release (manual step required)"
 
-          # Linux binary
-          gh release download "$LATEST" \
-            --repo mercurai/geekmode-rust \
-            --pattern "gm-mcp-x86_64-unknown-linux-musl" \
-            --dir plugins/geekmode-rust/mcp/ \
-            --clobber || echo "Linux binary not found in release (manual step required)"
-
-          # macOS binary
-          gh release download "$LATEST" \
-            --repo mercurai/geekmode-rust \
-            --pattern "gm-mcp-aarch64-apple-darwin" \
-            --dir plugins/geekmode-rust/mcp/ \
-            --clobber || echo "macOS binary not found in release (manual step required)"
-
           ls -lh plugins/geekmode-rust/mcp/ || true
-
-      - name: Rename binaries to canonical names
-        run: |
-          [ -f "plugins/geekmode-rust/mcp/gm-mcp-x86_64-pc-windows-msvc.exe" ] && \
-            mv plugins/geekmode-rust/mcp/gm-mcp-x86_64-pc-windows-msvc.exe plugins/geekmode-rust/mcp/gm-mcp.exe || true
-          [ -f "plugins/geekmode-rust/mcp/gm-mcp-x86_64-unknown-linux-musl" ] && \
-            mv plugins/geekmode-rust/mcp/gm-mcp-x86_64-unknown-linux-musl plugins/geekmode-rust/mcp/gm-mcp-linux-x64 && \
-            chmod +x plugins/geekmode-rust/mcp/gm-mcp-linux-x64 || true
-          [ -f "plugins/geekmode-rust/mcp/gm-mcp-aarch64-apple-darwin" ] && \
-            mv plugins/geekmode-rust/mcp/gm-mcp-aarch64-apple-darwin plugins/geekmode-rust/mcp/gm-mcp-darwin-arm64 && \
-            chmod +x plugins/geekmode-rust/mcp/gm-mcp-darwin-arm64 || true
 
       - name: Create plugin archive
         run: |
