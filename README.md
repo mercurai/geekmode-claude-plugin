@@ -38,7 +38,7 @@ plugins/
     agents/               # 6 agent definitions
     skills/               # 7 skill definitions
     commands/
-    hooks/                # 4 hook scripts + hooks.json wiring
+    hooks/                # 3 hook scripts (4 registrations) + hooks.json wiring
     mcp/                  # gm-mcp binary placeholder
     README.md             # plugin-level documentation
 .github/                  # CI and release workflows

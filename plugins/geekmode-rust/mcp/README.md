@@ -31,6 +31,7 @@ To install:
 
 | Plugin version | geekmode-rust version |
 |---------------|----------------------|
+| v0.2.1        | ≥ v0.6.15            |
 | v0.2.0        | ≥ v0.6.15            |
 
 The MCP tool surface is stable from geekmode-rust v0.6.15 onward. Earlier versions may lack some tools.

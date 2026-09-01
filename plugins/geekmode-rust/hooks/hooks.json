@@ -8,12 +8,14 @@
     ],
     "PreToolUse": [
       {
-        "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use-destructive.sh", "timeout": 5 }]
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/gm-destructive-guard.py", "timeout": 5 }]
       }
     ],
     "PostToolUse": [
       {
-        "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-tool-use-timeline.sh", "timeout": 10 }]
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/gm-destructive-guard.py", "timeout": 5 }]
       }
     ],
     "Stop": [
