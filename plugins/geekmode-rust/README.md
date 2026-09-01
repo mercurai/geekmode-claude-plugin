@@ -67,14 +67,15 @@ claude plugins install mercurai/geekmode-claude-plugin
 | Hook | Event | Purpose |
 |------|-------|---------|
 | `session-start.sh` | SessionStart | Calls `gm health readyz`, surfaces failures upfront |
-| `pre-tool-use-destructive.sh` | PreToolUse | Warns before destructive `gm` operations |
-| `post-tool-use-timeline.sh` | PostToolUse | Logs destructive ops to session timeline |
+| `gm-destructive-guard.py` | PreToolUse (Bash) | Warns the model before a destructive `gm` operation |
+| `gm-destructive-guard.py` | PostToolUse (Bash) | Logs destructive ops that ran to the session timeline |
 | `stop-summary.sh` | Stop | Emits summary of operations performed |
 
 ## Version Compatibility
 
 | Plugin version | geekmode-rust version |
 |---------------|----------------------|
+| v0.2.1        | ≥ v0.6.15            |
 | v0.2.0        | ≥ v0.6.15            |
 | v0.1.0        | scaffolding only     |
 
