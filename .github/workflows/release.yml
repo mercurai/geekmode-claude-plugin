@@ -26,20 +26,26 @@ jobs:
 
       - name: Download gm-mcp binaries from geekmode-rust latest release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKEN cannot read the private geekmode-rust repo (every release run
+          # since v0.2.0 failed here), so the fetch is best-effort. Set the repo secret
+          # GEEKMODE_RUST_TOKEN (a PAT with repo scope) to bundle the binary.
+          GH_TOKEN: ${{ secrets.GEEKMODE_RUST_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          # Find the latest geekmode-rust release that is >= v0.6.15
-          LATEST=$(gh release list --repo mercurai/geekmode-rust --limit 1 --json tagName -q '.[0].tagName')
-          echo "Fetching gm-mcp from geekmode-rust $LATEST"
-
           mkdir -p plugins/geekmode-rust/mcp
 
-          # Windows binary (geekmode-rust release attaches gm-mcp.exe directly)
-          gh release download "$LATEST" \
-            --repo mercurai/geekmode-rust \
-            --pattern "gm-mcp.exe" \
-            --dir plugins/geekmode-rust/mcp/ \
-            --clobber || echo "Windows binary not found in release (manual step required)"
+          # Latest geekmode-rust release (>= v0.6.15); empty when the token cannot see the repo
+          LATEST=$(gh release list --repo mercurai/geekmode-rust --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null || true)
+          if [ -z "$LATEST" ]; then
+            echo "geekmode-rust releases not reachable with this token; shipping without gm-mcp.exe (see mcp/README.md)"
+          else
+            echo "Fetching gm-mcp from geekmode-rust $LATEST"
+            # Windows binary (geekmode-rust release attaches gm-mcp.exe directly)
+            gh release download "$LATEST" \
+              --repo mercurai/geekmode-rust \
+              --pattern "gm-mcp.exe" \
+              --dir plugins/geekmode-rust/mcp/ \
+              --clobber || echo "Windows binary not found in release (manual step required)"
+          fi
 
           ls -lh plugins/geekmode-rust/mcp/ || true
 
